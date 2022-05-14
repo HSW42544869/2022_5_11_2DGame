@@ -26,12 +26,17 @@ public class Player : MonoBehaviour
     [Header("檢查地面半徑")]
     public float radius = .3f;
 
+    /// <summary>
+    /// 是否在傳送門裡面
+    /// </summary>
+    public bool inDoor;
 
     //分數
     private int fraction = 0;
     private AudioSource aud;
     private Rigidbody2D rig;
     private Animator ani;
+    private GameManager gm;
     #endregion
     /// <summary>
     /// 事件:喚醒-在Start 之前執行一次
@@ -43,16 +48,17 @@ public class Player : MonoBehaviour
         rig = GetComponent<Rigidbody2D>();
         ani = GetComponent<Animator>();
         aud = GetComponent<AudioSource>();
-    }
-    private void Start()
-    {
-
+        // 透過 <類型> 取得物件 
+        //僅限於此<類型>在場上只有一個
+        gm = FindObjectOfType<GameManager>();
     }
     private void Update()
     {
         Move();
         Fire();
         Jump();
+
+        NextLevel();
     }
     #region 移動
     /// <summary>
@@ -79,6 +85,7 @@ public class Player : MonoBehaviour
         }
     }
     #endregion
+    #region 跳躍
     /// <summary>
     /// 跳躍功能
     /// </summary>
@@ -102,6 +109,7 @@ public class Player : MonoBehaviour
             isground = false;       //不在地面上了
         }
     }
+    #endregion
     #region 開槍
     /// <summary>
     /// 開槍功能
@@ -126,6 +134,7 @@ public class Player : MonoBehaviour
         }
     }
     #endregion
+    #region 死亡
     /// <summary>
     /// 死亡功能
     /// </summary>
@@ -136,14 +145,21 @@ public class Player : MonoBehaviour
         //等於 ==
         if (obj == "死亡區域" || obj == "敵人子彈")
         {
+            //如果 死亡開關 為 ture 就 跳出
+            if (ani.GetBool("死亡開關")) return;
+
             //enabled = false; 等同於 this.enabled = false;
             enabled = false;        //關閉此腳本
             ani.SetBool("死亡開關", true);
 
             //延遲呼叫("方法名稱",延遲呼叫)
             Invoke("Replay", 2);
+
+            //呼叫 GM 處理玩家死亡
+            gm.PlayerDead();
         }
     }
+    #endregion
     /// <summary>
     /// 重新載入關卡
     /// </summary>
@@ -159,6 +175,34 @@ public class Player : MonoBehaviour
     private void OnCollisionEnter2D(Collision2D collision)
     {
         Dead(collision.gameObject.tag);
+    }
+    /// <summary>
+    /// 觸發事件:
+    /// 兩個碰撞物件有其中一個勾選 IsTrigger
+    /// </summary>
+    /// <param name="collision"></param>
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.name == "傳送門") inDoor = true;
+    }
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if (collision.name == "傳送門") inDoor = false;
+    }
+    /// <summary>
+    /// 前往下一關
+    /// </summary>
+    private void NextLevel()
+    {
+        if (inDoor == true && Input.GetKeyDown(KeyCode.W))                  //如果 在門裡面 並且 按下 W
+        {
+            //取得現在場景編號
+            int livIndex= SceneManager.GetActiveScene().buildIndex;         //取得當前場景編號
+
+            livIndex++;                                                     //當前場景編號加1
+
+            SceneManager.LoadScene(livIndex);                               //載入下一關
+        }
     }
     /// <summary>
     /// 繪製圖示:僅顯示於場景面板

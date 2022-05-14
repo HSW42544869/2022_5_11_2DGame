@@ -26,12 +26,15 @@ public class Enemy : MonoBehaviour
     public float rangeAttack = 8.5f;
     [Header("開槍間格秒數"), Range(0, 10)]
     public float intervalAttack = 2.5f;
+    [Header("分數"), Range(0, 5000)]
+    public int score = 50;
     private float time;
     [Header("玩家物件")]
     public Transform player;
     private AudioSource aud;
     private Rigidbody2D rig;
     private Animator ani;
+    private GameManager gm;
     #endregion
 
     /// <summary>
@@ -98,6 +101,8 @@ public class Enemy : MonoBehaviour
         GetComponent<CapsuleCollider2D>().enabled = false;  //關閉碰撞器
         rig.Sleep();                                        //剛體睡著
         Destroy(gameObject,2.5f);                           //刪除物件
+
+        gm.AddScore(score);
     }
     #endregion
 
@@ -121,6 +126,7 @@ public class Enemy : MonoBehaviour
         aud = GetComponent<AudioSource>();
         rig = GetComponent<Rigidbody2D>();
         ani = GetComponent<Animator>();
+        gm = FindObjectOfType<GameManager>();
     }
     private void Update()
     {
