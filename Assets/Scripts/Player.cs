@@ -139,11 +139,11 @@ public class Player : MonoBehaviour
     /// 死亡功能
     /// </summary>
     /// <param name="obj">碰到物件的名稱</param>
-    private void Dead(string obj)
+    public void Dead(string obj)
     {
         //如果 物件名稱 == 死亡區域
         //等於 ==
-        if (obj == "死亡區域" || obj == "敵人子彈")
+        if (obj == "死亡區域" || obj == "敵人子彈" || obj == "陷阱")
         {
             //如果 死亡開關 為 ture 就 跳出
             if (ani.GetBool("死亡開關")) return;
@@ -153,7 +153,8 @@ public class Player : MonoBehaviour
             ani.SetBool("死亡開關", true);
 
             //延遲呼叫("方法名稱",延遲呼叫)
-            Invoke("Replay", 2);
+            //類別名稱.靜態成員.存取
+            if(GameManager.live>1)Invoke("Replay", 2);
 
             //呼叫 GM 處理玩家死亡
             gm.PlayerDead();
@@ -161,11 +162,12 @@ public class Player : MonoBehaviour
     }
     #endregion
     /// <summary>
-    /// 重新載入關卡
+    /// 重新載入遊戲:重新載入當前關卡
     /// </summary>
     private void Replay()
     {
-        SceneManager.LoadScene("關卡一");
+        // 載入場景(當前場景 的 名稱)
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
     /// <summary>
     /// OCE 碰撞時執行一次的事件

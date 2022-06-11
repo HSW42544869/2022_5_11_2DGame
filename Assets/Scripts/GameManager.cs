@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;       // 引用 介面 UI
+using UnityEngine.SceneManagement;
 /// <summary>
 /// 遊戲管理器:管理生命、分數
 /// </summary>
@@ -10,6 +11,8 @@ public class GameManager : MonoBehaviour
     public GameObject[] lives;
     [Header("數字文字介面")]
     public Text textScore;
+    [Header("結束畫面")]
+    public GameObject Fine;
     //死亡後分數歸零
     public static int score;
     // 一般欄位 重新仔入場景 會還原為預設值
@@ -31,6 +34,22 @@ public class GameManager : MonoBehaviour
 
         textScore.text = "scoring:" + score;     //更新文字介面
     }
+    private void Update()
+    {
+        BackTomenu();
+        QuitGame();
+    }
+    /// <summary>
+    /// 返回選單
+    /// </summary>
+    private void BackTomenu()
+    {
+        if(live == 0 && Input.GetKeyDown(KeyCode.R)) SceneManager.LoadScene("選單");
+    }
+    private void QuitGame()
+    {
+        if (live == 0 && Input.GetKeyDown(KeyCode.Escape)) Application.Quit();
+    }
     /// <summary>
     /// 玩家死亡
     /// </summary>
@@ -39,6 +58,7 @@ public class GameManager : MonoBehaviour
         live--;
 
         SetLive();
+        if (live == 0) Fine.SetActive(true);
     }
     private void SetLive()
     {

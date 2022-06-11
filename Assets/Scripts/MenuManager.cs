@@ -1,8 +1,16 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;      //引用場景管理 API
 
+/// <summary>
+/// 選單管理器
+/// </summary>
 public class MenuManager : MonoBehaviour
 {
+    private void Awake()
+    {
+        GameManager.live = 3;       //恢復生命數量
+    }
+
     /// <summary>
     /// 開始遊戲
     /// </summary>
